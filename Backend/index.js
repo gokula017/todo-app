@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express()
 
-const url = 'mongodb://localhost:27017';
+const url = process.env.DB_URL
 const dbName = 'todo';
 const collectionName = 'tasks';
 let collection = "";
@@ -36,9 +36,9 @@ app.get('/', (req, resp) => {
     resp.send('Working')
 })
 
-app.post('/add', (req, resp) => {
+app.post('/add', async (req, resp) => {
     try {
-        const result = collection.insertOne(req.body);
+        const result = await collection.insertOne(req.body);
         console.log(result)
         resp.status(200).send({ message: 'Task Added', success: true })
     } catch (err) {
@@ -49,7 +49,7 @@ app.post('/add', (req, resp) => {
 
 app.get('/tasks', async (req, resp) => {
     try {
-        const result = await collection.find(req.body).sort({ _id: -1 }).toArray();
+        const result = await collection.find({}).sort({ _id: -1 }).toArray();
         console.log(result)
         resp.status(200).send({ result, success: true })
     } catch (err) {
@@ -58,11 +58,14 @@ app.get('/tasks', async (req, resp) => {
 })
 
 
-app.delete('/task/:id', (req, resp) => {
+app.delete('/task/:id', async (req, resp) => {
     try {
-        const result = collection.deleteOne({ _id: new ObjectId(req.params.id) });
-        console.log()
-        resp.status(200).send({ message: 'Task Deleted', success: true })
+        const result = await collection.deleteOne({ _id: new ObjectId(req.params.id) });
+        if (result.deletedCount > 0) {
+            resp.status(200).send({ message: 'Task Deleted', success: true });
+        } else {
+            resp.status(404).send({ message: 'Task not found', success: false });
+        }
     } catch (err) {
         resp.status(500).send({ message: 'Failed! Task could not be deleted', success: false })
     }
@@ -98,10 +101,9 @@ app.put('/task/:id', async (req, resp) => {
 // Serve frontend build in production
 app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, "../Frontend/dist", "index.html"));
 });
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`App is running on port ${PORT}`))
