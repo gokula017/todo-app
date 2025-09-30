@@ -39,7 +39,6 @@ app.use(cors())
 app.post('/add', async (req, resp) => {
     try {
         const result = await collection.insertOne(req.body);
-        console.log(result)
         resp.status(200).send({ message: 'Task Added', success: true })
     } catch (err) {
         resp.status(500).send({ message: 'Failed! Task could not be added', success: false })
@@ -50,7 +49,6 @@ app.post('/add', async (req, resp) => {
 app.get('/tasks', async (req, resp) => {
     try {
         const result = await collection.find({}).sort({ _id: -1 }).toArray();
-        console.log(result)
         resp.status(200).send({ result, success: true })
     } catch (err) {
         resp.status(500).send({ message: 'Failed! Task did not found', success: false })
@@ -74,7 +72,6 @@ app.delete('/task/:id', async (req, resp) => {
 app.get('/task/:id', async (req, resp) => {
     try {
         const result = await collection.findOne({ _id: new ObjectId(req.params.id) });
-        console.log(result)
         resp.status(200).send({ result, success: true })
     } catch (err) {
         resp.status(500).send({ message: 'Failed! Task could not be deleted', success: false })

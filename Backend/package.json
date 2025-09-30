@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "build": "cd Frontend && npm install && npm run build && cd .. && cp -r Frontend/dist Backend/dist"
+    "dev": "nodemon index.js"
   },
   "type": "module",
   "keywords": [
