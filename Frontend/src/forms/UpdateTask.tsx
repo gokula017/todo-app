@@ -33,7 +33,6 @@ function UpdateTask() {
 
     const handleTaskUpdate = async () => {
         try {
-            console.log("Sending taskData:", taskData);
 
             const response = await fetch(`${API_URL}/task/${id}`, {
                 method: "PUT",
@@ -41,7 +40,6 @@ function UpdateTask() {
                 body: JSON.stringify(taskData)
             })
             const result = await response.json()
-            console.log("Update response:", result);
 
             if (result.success) {
                 setMessage("Task updated successfully");
