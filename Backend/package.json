@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "cd ../frontend && npm install && npm run build && cp -r dist ../backend/"
+    "build": "cd ../frontend && npm install"
   },
-  "type": "module",
+  "type": "module", 
   "keywords": [
     "ToDo",
     "App"
@@ -21,5 +21,8 @@
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1"
   }
 }
