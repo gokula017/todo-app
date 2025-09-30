@@ -15,10 +15,6 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Build output (if any)
-dist/
-build/
-
 # Optional: VSCode settings folder
 .vscode/
 
