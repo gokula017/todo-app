@@ -96,11 +96,11 @@ app.put('/task/:id', async (req, resp) => {
 })
 
 // Serve frontend build in production
-app.use(express.static(path.join(__dirname, "/dist"))); 
+app.use(express.static(path.join(__dirname, "dist"))); 
 
 // Catch-all route to serve index.html
 app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.resolve(__dirname, '/dist', '/index.html'));
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
