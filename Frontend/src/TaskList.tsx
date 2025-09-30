@@ -12,10 +12,13 @@ function TaskList() {
 
     const [tasks, setTasks] = useState<taskType[]>([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await fetch('http://localhost:1219/tasks');
+      const response = await fetch(`${API_URL}/tasks`);
+
                 const data = await response.json()
                 setTasks(data.result)
                 console.log('Task found : ', data)
@@ -28,7 +31,7 @@ function TaskList() {
 
     const handleTaskDelete = async (id: unknown) => {
         try {
-            const response = await fetch(`http://localhost:1219/task/${id}`, {
+            const response = await fetch(`${API_URL}/task/${id}`, {
                 method: "DELETE"
             })
             const data = await response.json()

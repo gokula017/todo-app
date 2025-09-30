@@ -10,7 +10,7 @@ function AddTask() {
   const [taskData, setTaskData] = useState<Task>({ title: "", description: "" });
   const [message, setMessage] = useState<string>("")
   const [variant, setVariant] = useState<"success" | "danger" | "">("")
-  const url = 'http://localhost:1219/add'
+  const url = `${import.meta.env.VITE_API_URL}/add`;
 
   const handleAddTask = async () => {
 
