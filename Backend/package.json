@@ -4,9 +4,9 @@
   "description": "ToDo App using Mongo, Express, React and Node",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
-    "build": "npx tsc && cd ../frontend && npm install && npm run build",
-    "start": "node dist/index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build": "cd ../Frontend && npm install && npm run build && cp -r dist Backend/dist"
   },
   "type": "module",
   "keywords": [
@@ -21,8 +21,5 @@
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
     "nodemon": "^3.1.10"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.2"
   }
 }
