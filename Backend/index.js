@@ -96,7 +96,7 @@ app.put('/task/:id', async (req, resp) => {
 })
 
 // Serve frontend build in production
-app.use(express.static(path.join(__dirname, "../frontend/dist"))); 
+app.use(express.static(path.join(__dirname, "/dist"))); 
 
 // Catch-all route to serve index.html
 app.get(/(.*)/, (req, res) => {
