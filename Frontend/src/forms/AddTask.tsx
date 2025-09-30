@@ -10,11 +10,11 @@ function AddTask() {
   const [taskData, setTaskData] = useState<Task>({ title: "", description: "" });
   const [message, setMessage] = useState<string>("")
   const [variant, setVariant] = useState<"success" | "danger" | "">("")
-  const url = `${import.meta.env.VITE_API_URL}/add`;
+  // const url = `${import.meta.env.VITE_API_URL}/add`;
 
   const handleAddTask = async () => {
 
-    let result = await fetch(url, {
+    let result = await fetch("/add", {
       method: 'POST',
       body: JSON.stringify(taskData),
       headers: { 'Content-Type': 'Application/JSON' }

@@ -14,12 +14,12 @@ function UpdateTask() {
 
     const { id } = useParams<{ id: string }>();
 
-    const API_URL = import.meta.env.VITE_API_URL;
+    // const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const singleTask = async () => {
             try {
-                const response = await fetch(`${API_URL}/task/${id}`);
+                const response = await fetch(`task/${id}`);
                 const data = await response.json()
                 setTaskData(data.result)
             } catch (err) {
@@ -34,7 +34,7 @@ function UpdateTask() {
     const handleTaskUpdate = async () => {
         try {
 
-            const response = await fetch(`${API_URL}/task/${id}`, {
+            const response = await fetch(`/task/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(taskData)
