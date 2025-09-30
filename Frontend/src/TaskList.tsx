@@ -21,7 +21,6 @@ function TaskList() {
 
                 const data = await response.json()
                 setTasks(data.result)
-                console.log('Task found : ', data)
             } catch (err) {
                 console.error('Error fetch task : ', err)
             }
@@ -46,7 +45,7 @@ function TaskList() {
         <Container className="mt-5 my-container">
             <Row>
                 <Col>
-                    <h1>Task List</h1>
+                    <h1>All Task</h1>
                     {tasks.map((task, index) => (
                         <div className="task-card" key={index}>
                             <div>
