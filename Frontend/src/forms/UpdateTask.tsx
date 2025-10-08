@@ -14,12 +14,12 @@ function UpdateTask() {
 
     const { id } = useParams<{ id: string }>();
 
-    // const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const singleTask = async () => {
             try {
-                const response = await fetch(`task/${id}`);
+                const response = await fetch(`${API_URL}/task/${id}`);
                 const data = await response.json()
                 setTaskData(data.result)
             } catch (err) {
@@ -34,7 +34,7 @@ function UpdateTask() {
     const handleTaskUpdate = async () => {
         try {
 
-            const response = await fetch(`/task/${id}`, {
+            const response = await fetch(`${API_URL}/task/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(taskData)
@@ -63,7 +63,7 @@ function UpdateTask() {
     }
     return (
         <>
-            <Container className="mt-5 my-container">
+            <Container className="mt-5 my-container form-container">
                 <Row className="mb-3">
                     <Col>
                         <h1>Update Task</h1>
@@ -87,7 +87,7 @@ function UpdateTask() {
                     </Button>
                 </Link>
             </Container>
-            <Container className="max-width text-center">
+            <Container className="form-container text-center">
                 {message && (
                     <Alert variant={variant} className="mt-3 p-2 px-3 alert-msg">
                         {message}

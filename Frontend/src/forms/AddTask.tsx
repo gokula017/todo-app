@@ -10,25 +10,31 @@ function AddTask() {
   const [taskData, setTaskData] = useState<Task>({ title: "", description: "" });
   const [message, setMessage] = useState<string>("")
   const [variant, setVariant] = useState<"success" | "danger" | "">("")
-  // const url = `${import.meta.env.VITE_API_URL}/add`;
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleAddTask = async () => {
 
-    let result = await fetch("/add", {
+    const response = await fetch(`${API_URL}/add`, {
       method: 'POST',
       body: JSON.stringify(taskData),
       headers: { 'Content-Type': 'Application/JSON' }
+      ,
+      credentials: 'include'
     });
-    result = await result.json()
+    const result = await response.json()
 
-    if (result) {
-      console.log('New task added');
-      setMessage('New task added')
-      setTaskData({ title: "", description: "" })
-      setVariant('success')
-    } else {
-      setMessage('Failed to add task')
-      setVariant('danger')
+    if (result.success) {
+      if (taskData.title != '' && taskData.description != '') {
+        console.log(taskData);
+        console.log('New task added');
+        setMessage('New task added')
+        setTaskData({ title: "", description: "" })
+        setVariant('success')
+      } else {
+        setMessage('All fields are mandatory.')
+        setVariant('danger')
+      }
     }
   }
 
@@ -47,7 +53,7 @@ function AddTask() {
 
   return (
     <>
-      <Container className="mt-5 my-container">
+      <Container className="mt-5 my-container form-container">
         <Row className="mb-3">
           <Col>
             <h1>New Task</h1>
@@ -62,11 +68,19 @@ function AddTask() {
           <Form.Label>Description</Form.Label>
           <Form.Control as="textarea" rows={3} name='description' value={taskData.description} onChange={(event) => setTaskData({ ...taskData, description: event.target.value })} />
         </Form.Group>
-        <Button className="btn-add" onClick={handleAddTask}>
-          Add Task
-        </Button>
+        {
+          taskData.title && taskData.description ?
+            <Button className="btn-add" onClick={handleAddTask}>
+              Add Task
+            </Button>
+            :
+            <Button className="btn-disabled">
+              Add Task
+            </Button>
+
+        }
       </Container>
-      <Container className='max-width text-center'>
+      <Container className='form-container text-center'>
         {message && <Alert variant={variant} className='mt-3 p-2 px-3 alert-msg'>{message}</Alert>}
       </Container>
     </>
