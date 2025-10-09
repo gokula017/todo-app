@@ -17,9 +17,12 @@ function UpdateTask() {
     const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
+        //If somehow id is undefined (e.g., user manually types /update/), then prevent fetch.
+        if(!id) return 
+
         const singleTask = async () => {
             try {
-                const response = await fetch(`${API_URL}/task/${id}`);
+                const response = await fetch(`${API_URL}/task/${id}`, { credentials: "include" });
                 const data = await response.json()
                 setTaskData(data.result)
             } catch (err) {
@@ -37,7 +40,8 @@ function UpdateTask() {
             const response = await fetch(`${API_URL}/task/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(taskData)
+                body: JSON.stringify(taskData),
+                credentials: "include"
             })
             const result = await response.json()
 

@@ -66,7 +66,7 @@ function AddTask() {
         </Form.Group>
         <Form.Group className="mb-4" controlId="addTask.ControlTextarea1">
           <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={3} name='description' value={taskData.description} onChange={(event) => setTaskData({ ...taskData, description: event.target.value })} />
+          <Form.Control as="textarea" rows={3} name='description' placeholder='Task Description' value={taskData.description} onChange={(event) => setTaskData({ ...taskData, description: event.target.value })} />
         </Form.Group>
         {
           taskData.title && taskData.description ?

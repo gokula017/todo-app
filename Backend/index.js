@@ -29,7 +29,11 @@ async function connection() {
 }
 
 app.use(express.json())
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://todo-app-931h.onrender.com/"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}))
 app.use(cookieParser())
 
 // app.get('/', (req, resp) => {
@@ -53,7 +57,7 @@ app.post('/add', verifyJWT, async (req, resp) => {
 
 
 app.get('/tasks', verifyJWT, async (req, resp) => {
-    console.log("Cookies Test", req.cookies['token'])
+    // console.log("Cookies Test", req.cookies['token'])
     try {
         const db = await connection();
         const collection = db.collection('tasks');
@@ -118,7 +122,12 @@ app.post('/signup', async (req, resp) => {
         const collection = await db.collection('users')
         const result = await collection.insertOne(userData)
         if (result) {
-            jwt.sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
+            jwt.cookie("token", token, {
+                httpOnly: true,
+                secure: true,        // must be true on HTTPS (Render uses HTTPS)
+                sameSite: "None",    // required when using cross-site cookies
+                maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+            }).sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
                 resp.status(200).send({ message: 'New user created', success: true, token })
             })
         }
@@ -135,7 +144,12 @@ app.post('/login', async (req, resp) => {
         const result = await collection.findOne({ email: userData.email, password: userData.password })
         if (result) {
             jwt.sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
-                resp.status(200).send({ message: 'User logged in', success: true, token })
+                resp.cookie("token", token, {
+                    httpOnly: true,
+                    secure: true,        // must be true on HTTPS (Render uses HTTPS)
+                    sameSite: "None",    // required when using cross-site cookies
+                    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+                }).status(200).send({ message: 'User logged in', success: true, token })
             })
         } else {
             resp.status(500).send({ message: 'User not found', success: false })
@@ -152,7 +166,6 @@ function verifyJWT(req, resp, next) {
         if (err) {
             return resp.send({ message: 'Invalid token', success: false })
         }
-        // console.log(decoded)
         next();
     })
 }

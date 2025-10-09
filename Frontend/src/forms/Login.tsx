@@ -73,9 +73,16 @@ function Login() {
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
                 </Form.Group>
-                <Button className="btn-add" onClick={handleLogin}>
-                    Login
-                </Button>
+                {userData.email && userData.password ?
+                    <Button className="btn-add" onClick={handleLogin}>
+                        Login
+                    </Button>
+                    :
+                    <Button className="btn-disabled">
+                        Login
+                    </Button>
+
+                }
 
                 <div className='mt-4'>
                     Not an user?
