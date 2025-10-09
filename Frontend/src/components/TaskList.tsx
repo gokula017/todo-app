@@ -19,7 +19,7 @@ function TaskList() {
 
     const fetchTasks = async () => {
         try {
-            const response = await fetch(`${API_URL}/tasks`, { method: "GET", credentials: 'include' });
+            const response = await fetch(`${API_URL}/tasks`, { method: "GET", credentials: "include" });
             const data = await response.json()
             setTasks(Array.isArray(data.result) ? data.result : []);
 

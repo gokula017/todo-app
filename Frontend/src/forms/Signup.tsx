@@ -74,7 +74,7 @@ function Signup() {
                 </Form.Group>
                 <Form.Group className="mb-4" controlId="Signup.ControlInput3">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type="text" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
+                    <Form.Control type="password" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
                 </Form.Group>
                 {userData.email && userData.password ?
                     <Button className="btn-add" onClick={handleSignup}>

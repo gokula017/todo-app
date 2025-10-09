@@ -29,8 +29,15 @@ async function connection() {
 }
 
 app.use(express.json())
+
+const allowedOrigins = [
+    "http://localhost:5173",           // Vite dev server
+    "http://localhost:5000",           // Local Server after build
+    "https://todo-app-931h.onrender.com" // Live server
+];
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "https://todo-app-931h.onrender.com"],
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }))
 app.use(cookieParser())
@@ -164,8 +171,8 @@ app.post('/login', async (req, resp) => {
         const token = jwt.sign({ email }, 'ThankYou', { expiresIn: "5d" });
         resp.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax",
+            secure: false,       // because now HTTP (unless backend uses HTTPS)
+            sameSite: "Lax",     // fine for same origin
             maxAge: 5 * 24 * 60 * 60 * 1000
         }).status(200).send({ message: "User logged in", success: true, token });
     } catch (err) {
@@ -178,7 +185,7 @@ app.post('/login', async (req, resp) => {
 app.use(express.static(path.join(__dirname, "dist")));
 
 // Catch-all route to serve index.html
-app.get(/(.*)/, (req, res) =>  res.sendFile(path.resolve(__dirname, 'dist', 'index.html')) );
+app.get(/(.*)/, (req, res) => res.sendFile(path.resolve(__dirname, 'dist', 'index.html')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`App is running on port ${PORT}`))

@@ -16,11 +16,11 @@ function AddTask() {
   const handleAddTask = async () => {
 
     const response = await fetch(`${API_URL}/add`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(taskData),
       headers: { 'Content-Type': 'Application/JSON' }
       ,
-      credentials: 'include'
+      credentials: "include"
     });
     const result = await response.json()
 
