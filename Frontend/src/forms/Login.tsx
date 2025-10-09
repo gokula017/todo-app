@@ -19,7 +19,7 @@ function Login() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
+            method: "POST",
             body: JSON.stringify(userData),
             headers: { 'Content-Type': 'application/json' },
             credentials: "include"
