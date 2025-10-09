@@ -30,7 +30,7 @@ async function connection() {
 
 app.use(express.json())
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "https://todo-app-931h.onrender.com/"],
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://todo-app-931h.onrender.com"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }))
@@ -122,13 +122,13 @@ app.post('/signup', async (req, resp) => {
         const collection = await db.collection('users')
         const result = await collection.insertOne(userData)
         if (result) {
-            jwt.cookie("token", token, {
-                httpOnly: true,
-                secure: true,        // must be true on HTTPS (Render uses HTTPS)
-                sameSite: "None",    // required when using cross-site cookies
-                maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-            }).sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
-                resp.status(200).send({ message: 'New user created', success: true, token })
+            jwt.sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
+                resp.cookie("token", token, {
+                    httpOnly: true,
+                    secure: true,        // must be true on HTTPS (Render uses HTTPS)
+                    sameSite: "None",    // required when using cross-site cookies
+                    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
+                }).status(200).send({ message: 'New user created', success: true, token })
             })
         }
     } else {
@@ -161,6 +161,8 @@ app.post('/login', async (req, resp) => {
 
 //Verify JWT Token
 function verifyJWT(req, resp, next) {
+    console.log("Cookies:", req.cookies);
+
     const token = req.cookies['token'];
     jwt.verify(token, 'ThankYou', (err, decoded) => {
         if (err) {

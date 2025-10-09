@@ -68,17 +68,11 @@ function AddTask() {
           <Form.Label>Description</Form.Label>
           <Form.Control as="textarea" rows={3} name='description' placeholder='Task Description' value={taskData.description} onChange={(event) => setTaskData({ ...taskData, description: event.target.value })} />
         </Form.Group>
-        {
-          taskData.title && taskData.description ?
-            <Button className="btn-add" onClick={handleAddTask}>
-              Add Task
-            </Button>
-            :
-            <Button className="btn-disabled">
-              Add Task
-            </Button>
 
-        }
+        <Button className="btn-add" onClick={handleAddTask} disabled={!taskData.title || !taskData.description}>
+          Add Task
+        </Button>
+
       </Container>
       <Container className='form-container text-center'>
         {message && <Alert variant={variant} className='mt-3 p-2 px-3 alert-msg'>{message}</Alert>}

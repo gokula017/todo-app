@@ -18,7 +18,7 @@ function UpdateTask() {
 
     useEffect(() => {
         //If somehow id is undefined (e.g., user manually types /update/), then prevent fetch.
-        if(!id) return 
+        if (!id) return
 
         const singleTask = async () => {
             try {
@@ -35,8 +35,13 @@ function UpdateTask() {
     }, [id])
 
     const handleTaskUpdate = async () => {
-        try {
+        if (!taskData.title.trim() || !taskData.description.trim()) {
+            setMessage("Please fill in all fields");
+            setVariant("danger");
+            return;
+        }
 
+        try {
             const response = await fetch(`${API_URL}/task/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -82,7 +87,8 @@ function UpdateTask() {
                     <Form.Label>Description</Form.Label>
                     <Form.Control as="textarea" rows={3} name='description' value={taskData.description} onChange={(event) => setTaskData({ ...taskData, description: event.target.value })} />
                 </Form.Group>
-                <Button className="btn-update" onClick={handleTaskUpdate}>
+                <Button className="btn-update" onClick={handleTaskUpdate}
+                    disabled={!taskData.title || !taskData.description}>
                     Update
                 </Button>
                 <Link to="/tasks">
