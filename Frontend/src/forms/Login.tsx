@@ -11,15 +11,17 @@ function Login() {
     const [userData, setUserData] = useState<loginData>({ email: "", password: "" });
     const [message, setMessage] = useState<string>("")
     const [variant, setVariant] = useState<"success" | "danger" | "">("")
+
     const API_URL = import.meta.env.VITE_API_URL;
 
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             body: JSON.stringify(userData),
-            headers: { 'Content-Type': 'Application/JSON' },
+            headers: { 'Content-Type': 'application/json' },
             credentials: "include"
         });
         const result = await response.json()
@@ -28,7 +30,7 @@ function Login() {
             setMessage('You are logged in.')
             setVariant('success')
 
-            document.cookie = "token=" + result.token;
+            //document.cookie = "token=" + result.token;
             localStorage.setItem("login", userData.email)
             window.dispatchEvent(new Event('localStorageChange'))
             navigate('/')
@@ -66,25 +68,23 @@ function Login() {
                     </Col>
                 </Row>
 
-                <Form.Group className="mb-4" controlId="Login.ControlInput1">
-                    <Form.Label>Email Id</Form.Label>
-                    <Form.Control type="text" name='email' placeholder="Enter Email Id" value={userData.email} onChange={(event) => setUserData({ ...userData, email: event.target.value })} />
-                </Form.Group>
-                <Form.Group className="mb-4" controlId="Login.ControlInput2">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
-                </Form.Group>
-                {userData.email && userData.password ?
-                    <Button className="btn-add" onClick={handleLogin}>
+                <Form onSubmit={handleLogin}>
+                    <Form.Group className="mb-4" controlId="Login.ControlInput1">
+                        <Form.Label>Email Id</Form.Label>
+                        <Form.Control type="text" name='email' placeholder="Enter Email Id" value={userData.email} onChange={(event) => setUserData({ ...userData, email: event.target.value })} />
+                    </Form.Group>
+                    <Form.Group className="mb-4" controlId="Login.ControlInput2">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control type="password" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
+                    </Form.Group>
+                    <Button
+                        type="submit"
+                        className="btn-add"
+                        disabled={!userData.email || !userData.password}
+                    >
                         Login
                     </Button>
-                    :
-                    <Button className="btn-disabled">
-                        Login
-                    </Button>
-
-                }
-
+                </Form>
                 <div className='mt-4'>
                     Not an user?
                     <Link to="/signup">
