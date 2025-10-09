@@ -31,21 +31,31 @@ async function connection() {
 app.use(express.json())
 app.use(cors({
     origin: ["http://localhost:5173", "http://localhost:5174", "https://todo-app-931h.onrender.com"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }))
 app.use(cookieParser())
 
-// app.get('/', (req, resp) => {
-//     resp.send('Working')
-// })
+//========== JWT Middleware ==========
+function verifyJWT(req, resp, next) {
+    console.log("Cookies:", req.cookies);
+
+    const token = req.cookies['token'];
+    if (!token) return resp.status(401).send({ message: "No token found", success: false });
+
+    jwt.verify(token, 'ThankYou', (err, decoded) => {
+        if (err) return resp.status(401).send({ message: "Invalid token", success: false });
+        req.user = decoded;
+        next();
+    })
+}
+
+// ======== API Routes ========
 
 app.post('/add', verifyJWT, async (req, resp) => {
     try {
-        if (req.body.title == "" || req.body.description == "") {
-            resp.status(500).send({ message: 'Task should not be left blank', success: false })
-            return
-        }
+        const { title, description } = req.body;
+        if (!title || !description) return resp.status(400).send({ message: "Task cannot be empty", success: false });
+
         const db = await connection();
         const collection = db.collection('tasks');
         const result = await collection.insertOne(req.body);
@@ -68,23 +78,21 @@ app.get('/tasks', verifyJWT, async (req, resp) => {
     }
 })
 
-
-
+// Delete task
 app.delete('/task/:id', verifyJWT, async (req, resp) => {
     try {
         const db = await connection();
         const collection = db.collection('tasks');
         const result = await collection.deleteOne({ _id: new ObjectId(req.params.id) });
-        if (result.deletedCount > 0) {
-            resp.status(200).send({ message: 'Task Deleted', success: true });
-        } else {
-            resp.status(404).send({ message: 'Task not found', success: false });
-        }
+        if (result.deletedCount > 0) return resp.status(200).send({ message: 'Task Deleted', success: true });
+        resp.status(404).send({ message: 'Task not found', success: false });
+
     } catch (err) {
         resp.status(500).send({ message: 'Failed! Task could not be deleted', success: false })
     }
 })
 
+// Get single task
 app.get('/task/:id', verifyJWT, async (req, resp) => {
     try {
         const db = await connection();
@@ -97,89 +105,80 @@ app.get('/task/:id', verifyJWT, async (req, resp) => {
 })
 
 app.put('/task/:id', verifyJWT, async (req, resp) => {
+    try {
+        const { id } = req.params;
+        const updateData = { ...req.body };
+        delete updateData._id; // remove _id if present
 
-    const { id } = req.params;
-    const updateData = { ...req.body };
-    delete updateData._id; // remove _id if present
+        const db = await connection();
+        const collection = db.collection('tasks');
+        const result = await collection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: updateData }
+        );
 
-    const db = await connection();
-    const collection = db.collection('tasks');
-    const result = await collection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updateData }
-    );
-    if (result.modifiedCount > 0) {
-        resp.status(200).send({ message: "Task updated successfully", success: true });
-    } else {
+        if (result.modifiedCount > 0) return resp.status(200).send({ message: "Task updated", success: true });
         resp.status(404).send({ message: "Task not found or no changes", success: false });
+    } catch (err) {
+        resp.status(500).send({ message: "Failed to update task", success: false });
     }
 });
 
+// Signup
 app.post('/signup', async (req, resp) => {
-    const userData = req.body;
-    if (userData.email && userData.password) {
+
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return resp.status(400).send({ message: "Invalid input", success: false });
+
+
         const db = await connection();
         const collection = await db.collection('users')
-        const result = await collection.insertOne(userData)
+        const result = await collection.insertOne({ email, password })
         if (result) {
-            jwt.sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
-                resp.cookie("token", token, {
-                    httpOnly: true,
-                    secure: true,        // must be true on HTTPS (Render uses HTTPS)
-                    sameSite: "None",    // required when using cross-site cookies
-                    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-                }).status(200).send({ message: 'New user created', success: true, token })
-            })
+            const token = jwt.sign({ email }, 'ThankYou', { expiresIn: "5d" });
+            resp.cookie("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax",
+                maxAge: 5 * 24 * 60 * 60 * 1000,
+            }).status(200).send({ message: 'New user created', success: true, token });
         }
-    } else {
-        resp.status(500).send({ message: 'Error in user creation', success: false })
+    } catch (err) {
+        resp.status(500).send({ message: "Failed to create user", success: false });
     }
 })
 
+// Login
 app.post('/login', async (req, resp) => {
-    const userData = req.body;
-    if (userData.email && userData.password) {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return resp.status(400).send({ message: "Invalid input", success: false });
+
         const db = await connection();
         const collection = await db.collection('users')
-        const result = await collection.findOne({ email: userData.email, password: userData.password })
-        if (result) {
-            jwt.sign(userData, 'ThankYou', { expiresIn: "5d" }, (error, token) => {
-                resp.cookie("token", token, {
-                    httpOnly: true,
-                    secure: true,        // must be true on HTTPS (Render uses HTTPS)
-                    sameSite: "None",    // required when using cross-site cookies
-                    maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
-                }).status(200).send({ message: 'User logged in', success: true, token })
-            })
-        } else {
-            resp.status(500).send({ message: 'User not found', success: false })
-        }
-    } else {
-        resp.status(500).send({ message: 'Error in login', success: false })
+        const result = await collection.findOne({ email, password })
+
+        if (!result) return resp.status(404).send({ message: "User not found", success: false });
+
+        const token = jwt.sign({ email }, 'ThankYou', { expiresIn: "5d" });
+        resp.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax",
+            maxAge: 5 * 24 * 60 * 60 * 1000
+        }).status(200).send({ message: "User logged in", success: true, token });
+    } catch (err) {
+        resp.status(500).send({ message: "Failed to login", success: false });
     }
 })
-
-//Verify JWT Token
-function verifyJWT(req, resp, next) {
-    console.log("Cookies:", req.cookies);
-
-    const token = req.cookies['token'];
-    jwt.verify(token, 'ThankYou', (err, decoded) => {
-        if (err) {
-            return resp.send({ message: 'Invalid token', success: false })
-        }
-        next();
-    })
-}
 
 
 // Serve frontend build in production
 app.use(express.static(path.join(__dirname, "dist")));
 
 // Catch-all route to serve index.html
-app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
+app.get(/(.*)/, (req, res) =>  res.sendFile(path.resolve(__dirname, 'dist', 'index.html')) );
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`App is running on port ${PORT}`))

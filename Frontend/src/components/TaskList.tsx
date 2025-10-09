@@ -21,7 +21,8 @@ function TaskList() {
         try {
             const response = await fetch(`${API_URL}/tasks`, { 'credentials': 'include' });
             const data = await response.json()
-            setTasks(data.result)
+            setTasks(Array.isArray(data.result) ? data.result : []);
+
         } catch (err) {
             console.error('Error fetch task : ', err)
         }
@@ -48,7 +49,7 @@ function TaskList() {
             <Row>
                 <Col>
                     <h1>All Task</h1>
-                    {tasks.length > 0 ? (
+                    {Array.isArray(tasks) && tasks.length > 0 ? (
 
                         tasks.map((task, index) => (
                             <div className="task-card" key={index}>
