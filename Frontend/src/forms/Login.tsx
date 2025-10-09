@@ -32,6 +32,7 @@ function Login() {
 
             //document.cookie = "token=" + result.token;
             localStorage.setItem("login", userData.email)
+            localStorage.setItem("uname", result.uname)
             window.dispatchEvent(new Event('localStorageChange'))
             navigate('/')
 

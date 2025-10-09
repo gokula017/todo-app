@@ -18,8 +18,7 @@ function AddTask() {
     const response = await fetch(`${API_URL}/add`, {
       method: "POST",
       body: JSON.stringify(taskData),
-      headers: { 'Content-Type': 'application/json' }
-      ,
+      headers: { 'Content-Type': 'application/json' },
       credentials: "include"
     });
     const result = await response.json()

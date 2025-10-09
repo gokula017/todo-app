@@ -3,13 +3,13 @@ import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 
 type Task = {
-    name: string,
+    uname: string,
     email: string,
     password: string
 }
 
 function Signup() {
-    const [userData, setUserData] = useState<Task>({ name: "", email: "", password: "" });
+    const [userData, setUserData] = useState<Task>({ uname: "", email: "", password: "" });
     const [message, setMessage] = useState<string>("")
     const [variant, setVariant] = useState<"success" | "danger" | "">("")
     const API_URL = import.meta.env.VITE_API_URL;
@@ -28,8 +28,10 @@ function Signup() {
 
         if (result.success) {
             setMessage('Signup completed.')
+            setVariant('success')
             document.cookie = "token=" + result.token
             localStorage.setItem("login", userData.email)
+            localStorage.setItem("uname", userData.uname)
             navigate('/')
         } else {
             setMessage('Failed to signup')
@@ -41,7 +43,7 @@ function Signup() {
         if (localStorage.getItem("login")) {
             navigate('/')
         }
-    })
+    }, [navigate])
 
     useEffect(() => {
         if (message) {
@@ -66,7 +68,7 @@ function Signup() {
 
                 <Form.Group className="mb-4" controlId="Signup.ControlInput1">
                     <Form.Label>Name</Form.Label>
-                    <Form.Control type="text" name='name' placeholder="Enter your name" value={userData.name} onChange={(event) => setUserData({ ...userData, name: event.target.value })} />
+                    <Form.Control type="text" name='uname' placeholder="Enter your name" value={userData.uname} onChange={(event) => setUserData({ ...userData, uname: event.target.value })} />
                 </Form.Group>
                 <Form.Group className="mb-4" controlId="Signup.ControlInput2">
                     <Form.Label>Email Id</Form.Label>
@@ -76,16 +78,13 @@ function Signup() {
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" name='password' placeholder="Enter Password" value={userData.password} onChange={(event) => setUserData({ ...userData, password: event.target.value })} />
                 </Form.Group>
-                {userData.email && userData.password ?
-                    <Button className="btn-add" onClick={handleSignup}>
-                        Signup
-                    </Button>
-                    :
-                    <Button className="btn-disabled">
-                        Signup
-                    </Button>
-                }
-
+                <Button
+                    className={userData.email && userData.password ? "btn-add" : "btn-disabled"}
+                    onClick={handleSignup}
+                    disabled={!userData.email || !userData.password}
+                >
+                    Signup
+                </Button>
                 <div className='mt-4'>
                     Already user?
                     <Link to="/login">

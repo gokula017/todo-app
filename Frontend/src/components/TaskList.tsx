@@ -6,6 +6,7 @@ type taskType = {
     _id: unknown,
     title: string,
     description: string,
+    uname: string
 }
 
 function TaskList() {
@@ -19,12 +20,14 @@ function TaskList() {
 
     const fetchTasks = async () => {
         try {
-            const response = await fetch(`${API_URL}/tasks`, { method: "GET", credentials: "include" });
+            const response = await fetch(`${API_URL}/tasks`, { credentials: "include" });
             const data = await response.json()
+            console.log(data.userName); // logged-in user's name
+            console.log(data.result);   // task
             setTasks(Array.isArray(data.result) ? data.result : []);
 
         } catch (err) {
-            console.error('Error fetch task : ', err)
+            console.error("Error fetch task : " + err)
         }
     }
 
@@ -48,14 +51,18 @@ function TaskList() {
         <Container className="mt-5 my-container">
             <Row>
                 <Col>
-                    <h1>All Task</h1>
+                    <h1>All Task </h1>
                     {Array.isArray(tasks) && tasks.length > 0 ? (
 
                         tasks.map((task, index) => (
                             <div className="task-card" key={index}>
                                 <div>
-                                    <div className="task-title">{task.title}</div>
-                                    <div className="task-description">{task.description}</div>
+                                    <div className="task-title">{task?.title}</div>
+                                    <div className="task-description">{task?.description}</div>
+
+                                    {/* <div className="text-muted mt-3"><small> 
+                                        Added by {task?.uname || "Unknown"}
+                                        </small></div> */}
                                 </div>
                                 <div>
                                     <Link to={`/update/${task._id}`}> <Button className="btn-update">Update</Button></Link>
