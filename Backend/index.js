@@ -44,7 +44,7 @@ app.use(cookieParser())
 
 //========== JWT Middleware ==========
 function verifyJWT(req, resp, next) {
-    console.log("Cookies:", req.cookies);
+    // console.log("Cookies:", req.cookies);
 
     const token = req.cookies['token'];
     if (!token) return resp.status(401).send({ message: "No token found", success: false });
@@ -168,11 +168,15 @@ app.post('/login', async (req, resp) => {
 
         if (!result) return resp.status(404).send({ message: "User not found", success: false });
 
-        const token = jwt.sign({ email }, 'ThankYou', { expiresIn: "5d" });
+        const token = jwt.sign(
+            { id: result._id, email: result.email },
+            'ThankYou',
+            { expiresIn: "1d" }
+        );
         resp.cookie("token", token, {
             httpOnly: true,
-            secure: false,       // because now HTTP (unless backend uses HTTPS)
-            sameSite: "Lax",     // fine for same origin
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? "None" : "Lax",
             maxAge: 5 * 24 * 60 * 60 * 1000
         }).status(200).send({ message: "User logged in", success: true, token });
     } catch (err) {
