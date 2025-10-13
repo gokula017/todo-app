@@ -55,9 +55,9 @@ function TaskList() {
                     {Array.isArray(tasks) && tasks.length > 0 ? (
 
                         tasks.map((task, index) => (
-                            <div className="task-card" key={index}>
-                                <div>
-                                    <div className="task-title">{task?.title}</div>
+                            <div className="task-card p-4" key={index}>
+                                <div className='me-4'>
+                                    <div className="task-title mb-2">{task?.title}</div>
                                     <div className="task-description">{task?.description}</div>
 
                                     {/* <div className="text-muted mt-3"><small> 
@@ -65,8 +65,8 @@ function TaskList() {
                                         </small></div> */}
                                 </div>
                                 <div>
-                                    <Link to={`/update/${task._id}`}> <Button className="btn-update">Update</Button></Link>
-                                    <Button className="btn-delete" onClick={() => handleTaskDelete(task._id)}>Delete</Button>
+                                    <Link to={`/update/${task._id}`}> <Button className="btn-update m-2">Update</Button></Link>
+                                    <Button className="btn-delete m-2" onClick={() => handleTaskDelete(task._id)}>Delete</Button>
                                 </div>
                             </div>
                         )))
